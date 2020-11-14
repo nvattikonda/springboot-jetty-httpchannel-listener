@@ -1,4 +1,4 @@
-package com.nv.jetty.config;
+package com.nv.jetty.server.httpchannel;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.server.HttpChannel;
@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.web.embedded.jetty.JettyServerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.nio.ByteBuffer;
@@ -22,11 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Configuration
+@Component
 @ConditionalOnWebApplication
 @Slf4j
 @ConditionalOnProperty(value = "jetty.httpchannel.listener", havingValue = "true", matchIfMissing = false)
-public class JettyHttpChannelListener {
+public class DefaultListenerImpl {
 
     @Value("${request.parsingTimeInMillis:5000}")
     private long requestParsingTimeInMillis;

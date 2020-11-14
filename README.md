@@ -41,7 +41,7 @@ use `sdkman` for installing JDK and Maven
 ##### Installing `Maven`
 [Installing Maven](https://sdkman.io/sdks#maven)
 
-### Building springboot-mongodb-example
+### Building springboot-jetty-httpchannel-listener
 **Build the project using command**
 
 nvattikonda@nvattikonda-mbp:`cd ~/projects/personal/springboot-jetty-httpchannel-listener &&  mvn clean install`
