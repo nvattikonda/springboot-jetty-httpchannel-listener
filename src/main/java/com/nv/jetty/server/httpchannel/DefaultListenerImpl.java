@@ -1,5 +1,6 @@
 package com.nv.jetty.server.httpchannel;
 
+import com.nv.jetty.server.httpchannel.diagnostic.DiagnosticTag;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.server.HttpChannel;
 import org.eclipse.jetty.server.Request;
@@ -22,6 +23,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 @Component
 @ConditionalOnWebApplication
@@ -186,9 +188,5 @@ public class DefaultListenerImpl {
         } catch (Exception e) {
             log.error("Encountered Error Comparing server requestCounter with maxThreads", e);
         }
-    }
-
-    private enum DiagnosticTag {
-        RequestBegin, RequestContent, RequestContentEnd, RequestEnd, ResponseBegin, ResponseCommit, ResponseContent, ResponseEnd, BeforeDispatch;
     }
 }
