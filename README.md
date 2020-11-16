@@ -50,5 +50,6 @@ nvattikonda@nvattikonda-mbp:`cd ~/projects/personal/springboot-jetty-httpchannel
 * Thanks to anyone who's code/framework/references/examples are used
 
 # Useful Information
+[Spring @Configuration vs @Component](http://dimafeng.com/2015/08/29/spring-configuration_vs_component/)
 
 [markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
