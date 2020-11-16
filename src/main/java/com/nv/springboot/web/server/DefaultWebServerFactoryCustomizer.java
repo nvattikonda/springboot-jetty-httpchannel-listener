@@ -54,8 +54,9 @@ public class DefaultWebServerFactoryCustomizer implements WebServerFactoryCustom
                         return true;
                     return false;
                 }).forEach(connector -> {
-                    logger.info("connector:{}",connector);
-                    connector.addBean(httpChannelListener);
+                    logger.info("connector:{}", connector);
+                    if (connector.addBean(httpChannelListener))
+                        logger.info("httpChannelListener:{} is added", httpChannelListener);
                 });
             });
         }
