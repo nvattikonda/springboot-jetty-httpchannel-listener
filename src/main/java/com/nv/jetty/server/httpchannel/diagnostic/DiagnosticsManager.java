@@ -18,9 +18,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component("nv.diagnosticsManager")
 @ConditionalOnWebApplication
 public class DiagnosticsManager {
-    @Value("${request.parsingTimeInMillis:5000}")
+    @Value("${nv.jetty.request.parsingTimeInMillis:5000}")
     private long requestParsingTimeInMillis;
-    @Value("${response.DispatchTimeInMillis:5000}")
+    @Value("${nv.jetty.response.DispatchTimeInMillis:5000}")
     private long responseDispatchTimeInMillis;
 
     private QueuedThreadPool queuedThreadPool;
@@ -58,24 +58,18 @@ public class DiagnosticsManager {
     public void log(Request request, DiagnosticTag diagnosticTags[]) {
         try {
             if (request != null) {
-                StringBuilder stringBuilder = new StringBuilder();
-                Enumeration<String> headers = request.getHeaderNames();
-                while (headers.hasMoreElements()) {
-                    String header = headers.nextElement();
-                    stringBuilder.append(header).append(":").append(request.getHeader(header));
-                    if (headers.hasMoreElements())
-                        stringBuilder.append("~");
-                }
+                StringBuilder logBuilder = new StringBuilder();
+                logBuilder.append(getHeadersAsString(request));
                 if (diagnosticTags != null) {
-                    stringBuilder.append("|");
+                    logBuilder.append("|");
                     Map<String, String> diagnosticContainer = (HashMap) request.getAttribute(DIAGNOSTIC_CONTAINER);
                     for (int i = 0; i < diagnosticTags.length; i++) {
-                        stringBuilder.append(diagnosticTags[i]).append(":").append(diagnosticContainer.get(diagnosticTags[i].name()));
+                        logBuilder.append(diagnosticTags[i]).append(":").append(diagnosticContainer.get(diagnosticTags[i].name()));
                         if (i < (diagnosticTags.length - 1))
-                            stringBuilder.append("~");
+                            logBuilder.append("~");
                     }
                 }
-                logger.info(stringBuilder.toString());
+                logger.info(logBuilder.toString());
             }
         } catch (Exception e) {
             logger.error("Encountered Error Processing DiagnosticTags:" + diagnosticTags != null ? Arrays.toString(diagnosticTags) : "NULL", e);
@@ -101,20 +95,34 @@ public class DiagnosticsManager {
     private void logRequestQueuing(Request request) {
         try {
             if (queuedThreadPool != null && requestCounter.intValue() > queuedThreadPool.getMaxThreads()) {
-                logger.warn("Requests getting queued, requestCount:{},configuredMaxThreads:{},queueSize:{}", requestCounter.intValue(), queuedThreadPool.getMaxThreads(), queuedThreadPool.getQueueSize());
+                logger.warn("Requests getting queued, currentRequestProcessingCount:{},configuredMaxThreads:{},threadPoolQueueSize:{}, requestHeaders:{}", requestCounter.intValue(), queuedThreadPool.getMaxThreads(), queuedThreadPool.getQueueSize(), getHeadersAsString(request));
             }
         } catch (Exception e) {
             logger.error("Encountered Error Comparing server requestCounter with maxThreads", e);
         }
     }
 
-    public int incrementRequestCounter(Request request){
+    private String getHeadersAsString(Request request) {
+        StringBuilder requestHeaderBuilder = new StringBuilder();
+        if (request != null) {
+            Enumeration<String> headers = request.getHeaderNames();
+            while (headers.hasMoreElements()) {
+                String header = headers.nextElement();
+                requestHeaderBuilder.append(header).append(":").append(request.getHeader(header));
+                if (headers.hasMoreElements())
+                    requestHeaderBuilder.append("~");
+            }
+        }
+        return requestHeaderBuilder.toString();
+    }
+
+    public int incrementRequestCounter(Request request) {
         requestCounter.incrementAndGet();
         logRequestQueuing(request);
         return requestCounter.intValue();
     }
 
-    public int decrementRequestCounter(Request request){
+    public int decrementRequestCounter(Request request) {
         return requestCounter.decrementAndGet();
     }
 }
