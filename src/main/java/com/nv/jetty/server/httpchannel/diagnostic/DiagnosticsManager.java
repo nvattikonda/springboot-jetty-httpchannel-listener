@@ -62,8 +62,9 @@ public class DiagnosticsManager {
                 logBuilder.append(getHeadersAsString(request));
                 if (diagnosticTags != null) {
                     logBuilder.append("|");
-                    Map<String, String> diagnosticContainer = (HashMap) request.getAttribute(DIAGNOSTIC_CONTAINER);
+                    Map<String, Object> diagnosticContainer = (HashMap) request.getAttribute(DIAGNOSTIC_CONTAINER);
                     for (int i = 0; i < diagnosticTags.length; i++) {
+                        //TODO In future, when request/response content chunks are captured below code needs to be updated
                         logBuilder.append(diagnosticTags[i]).append(":").append(diagnosticContainer.get(diagnosticTags[i].name()));
                         if (i < (diagnosticTags.length - 1))
                             logBuilder.append("~");
@@ -77,7 +78,7 @@ public class DiagnosticsManager {
     }
 
     public void captureDiagnosticData(Request request, DiagnosticTag diagnosticTag) {
-        //In future, can also capture request/response content chunks if needed via Object
+        //TODO In future, can also capture request/response content chunks if needed via Object
         Map<String, Object> diagnosticContainer = (Map) request.getAttribute(DIAGNOSTIC_CONTAINER);
         try {
             if (diagnosticContainer != null) {
@@ -92,10 +93,10 @@ public class DiagnosticsManager {
         }
     }
 
-    private void logRequestQueuing(Request request) {
+    private void logRequestQueuing(Request request, int currentRequestCount) {
         try {
-            if (queuedThreadPool != null && requestCounter.intValue() > queuedThreadPool.getMaxThreads()) {
-                logger.warn("Requests getting queued, currentRequestProcessingCount:{},configuredMaxThreads:{},threadPoolQueueSize:{}, requestHeaders:{}", requestCounter.intValue(), queuedThreadPool.getMaxThreads(), queuedThreadPool.getQueueSize(), getHeadersAsString(request));
+            if (queuedThreadPool != null && currentRequestCount > queuedThreadPool.getMaxThreads()) {
+                logger.warn("Requests getting queued, currentRequestProcessingCount:{},configuredMaxThreads:{},threadPoolQueueSize:{}, requestHeaders:{}", currentRequestCount, queuedThreadPool.getMaxThreads(), queuedThreadPool.getQueueSize(), getHeadersAsString(request));
             }
         } catch (Exception e) {
             logger.error("Encountered Error Comparing server requestCounter with maxThreads", e);
@@ -117,9 +118,9 @@ public class DiagnosticsManager {
     }
 
     public int incrementRequestCounter(Request request) {
-        requestCounter.incrementAndGet();
-        logRequestQueuing(request);
-        return requestCounter.intValue();
+        int currentRequestCount=requestCounter.incrementAndGet();
+        logRequestQueuing(request,currentRequestCount);
+        return currentRequestCount;
     }
 
     public int decrementRequestCounter(Request request) {
