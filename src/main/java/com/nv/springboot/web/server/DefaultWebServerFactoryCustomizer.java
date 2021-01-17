@@ -59,6 +59,8 @@ public class DefaultWebServerFactoryCustomizer implements WebServerFactoryCustom
                         logger.info("httpChannelListener:{} is added", httpChannelListener);
                 });
             });
+        }else{
+            logger.warn("leveraging configurableServletWebServerFactory:{}",configurableServletWebServerFactory.toString());
         }
     }
 }
