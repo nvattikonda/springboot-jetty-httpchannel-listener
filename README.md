@@ -6,6 +6,7 @@ springboot-jetty-httpchannel-listener project provides information on following
 
 1. Clients which are slow in sending request and consuming response payload from springboot service
 2. Clients whose requests are put in backlog queue when all Jetty threads are in use
+3. springboot service which takes more time processing and dispatching response to clients request
 
 # Getting Started
 Get copy of **springboot-jetty-httpchannel-listener** module via
@@ -45,6 +46,33 @@ use `sdkman` for installing JDK and Maven
 **Build the project using command**
 
 nvattikonda@nvattikonda-mbp:`cd ~/projects/personal/springboot-jetty-httpchannel-listener &&  mvn clean install`
+
+## How to use springboot-jetty-httpchannel-listener
+
+import springboot-jetty-httpchannel-listener project
+
+```
+ <groupId>com.nv</groupId>
+ <artifactId>springboot-jetty-httpchannel-listener</artifactId>
+ <version>0.0.1-SNAPSHOT</version>
+```
+replace `<version>` with appropriate value
+
+Refer to [Configuration](#configuration) section for setting appropriate configuration
+
+## Configuration
+
+In application.properties or application.yaml configure following properties
+
+`nv.jetty.httpchannel.listener` property defines whether httpchannel listener should be enabled/disabled. 
+Default value is `false` to enable value should be `true`
+
+`nv.jetty.request.parsingTimeInMillis` property defines which requests `DiagnosticsManager` should making entry to log file.
+Default is any requests whose request complete request parsing takes more than 5000ms prior dispatching to request handler.
+Value can be adjusted based on service needs.
+
+`nv.jetty.response.DispatchTimeInMillis` property defines which requests `DiagnosticsManager` should making entry to log file.
+Default is any requests whose response takes more than 5000ms to be fully written. Value can be adjusted based on service needs.
 
 # Acknowledgments
 * Thanks to anyone who's code/framework/references/examples are used
