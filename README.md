@@ -49,7 +49,28 @@ nvattikonda@nvattikonda-mbp:`cd ~/projects/personal/springboot-jetty-httpchannel
 
 ## How to use springboot-jetty-httpchannel-listener
 
-import springboot-jetty-httpchannel-listener project
+Ensure `spring-boot-starter-jetty` is leveraged, refer below how to disable **tomcat** and enable **jetty**
+
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <scope>provided</scope>
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jetty</artifactId>
+    <scope>provided</scope>
+</dependency>
+```
+
+import **springboot-jetty-httpchannel-listener** project
 
 ```
  <groupId>com.nv</groupId>
@@ -64,7 +85,7 @@ Refer to [Configuration](#configuration) section for setting appropriate configu
 
 In application.properties or application.yaml configure following properties
 
-`nv.jetty.httpchannel.listener` property defines whether httpchannel listener should be enabled/disabled. 
+`nv.jetty.httpchannel.diagnostics` property defines whether httpchannel diagnostics should be enabled/disabled. 
 Default value is `false` to enable value should be `true`
 
 `nv.jetty.request.parsingTimeInMillis` property defines which requests `DiagnosticsManager` should making entry to log file.

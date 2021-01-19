@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 
 @Component("nv.defaultWebServerFactoryCustomizer")
 @ConditionalOnWebApplication
+@ConditionalOnProperty(value = "nv.jetty.httpchannel.diagnostics", havingValue = "true", matchIfMissing = false)
 public class DefaultWebServerFactoryCustomizer implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
 
     private Logger logger = LoggerFactory.getLogger(DefaultWebServerFactoryCustomizer.class);

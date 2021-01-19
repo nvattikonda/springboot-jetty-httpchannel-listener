@@ -5,6 +5,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component("nv.diagnosticsManager")
 @ConditionalOnWebApplication
+@ConditionalOnProperty(value = "nv.jetty.httpchannel.diagnostics", havingValue = "true", matchIfMissing = false)
 public class DiagnosticsManager {
     @Value("${nv.jetty.request.parsingTimeInMillis:5000}")
     private long requestParsingTimeInMillis;

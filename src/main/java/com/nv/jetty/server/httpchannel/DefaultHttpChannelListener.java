@@ -15,7 +15,7 @@ import java.nio.ByteBuffer;
 
 @Component("nv.defaultHttpChannelListener")
 @ConditionalOnWebApplication
-@ConditionalOnProperty(value = "nv.jetty.httpchannel.listener", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(value = "nv.jetty.httpchannel.diagnostics", havingValue = "true", matchIfMissing = false)
 public class DefaultHttpChannelListener implements HttpChannel.Listener {
 
     private DiagnosticsManager diagnosticsManager;
