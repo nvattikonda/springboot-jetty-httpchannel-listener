@@ -44,7 +44,7 @@ public class DiagnosticsManager {
                             log(request, new DiagnosticTag[]{DiagnosticTag.RequestBegin, DiagnosticTag.BeforeDispatch, DiagnosticTag.RequestContent, DiagnosticTag.RequestContentEnd, DiagnosticTag.RequestEnd});
                         break;
                     case ResponseEnd:
-                        if (Long.valueOf(diagnosticContainer.get(diagnosticTag.name())) - Long.valueOf(diagnosticContainer.get(DiagnosticTag.ResponseEnd.name())) > responseDispatchTimeInMillis)
+                        if (Long.valueOf(diagnosticContainer.get(diagnosticTag.name())) - Long.valueOf(diagnosticContainer.get(DiagnosticTag.ResponseBegin.name())) > responseDispatchTimeInMillis)
                             log(request, new DiagnosticTag[]{DiagnosticTag.ResponseBegin, DiagnosticTag.ResponseCommit, DiagnosticTag.ResponseContent, DiagnosticTag.ResponseEnd});
                         break;
                     default:
