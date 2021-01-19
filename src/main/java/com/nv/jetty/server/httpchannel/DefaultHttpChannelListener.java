@@ -65,7 +65,7 @@ public class DefaultHttpChannelListener implements HttpChannel.Listener {
 
     @Override
     public void onResponseContent(Request request, ByteBuffer content) {
-        diagnosticsManager.captureDiagnosticData(request, DiagnosticTag.RequestContent);
+        diagnosticsManager.captureDiagnosticData(request, DiagnosticTag.ResponseContent);
     }
 
     @Override
