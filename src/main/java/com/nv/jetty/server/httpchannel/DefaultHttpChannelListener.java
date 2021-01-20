@@ -39,6 +39,7 @@ public class DefaultHttpChannelListener implements HttpChannel.Listener {
 
     @Override
     public void onRequestContent(Request request, ByteBuffer content) {
+        //TODO In future, leverage container to capture individual request chunks time via Object
         diagnosticsManager.captureDiagnosticData(request, DiagnosticTag.RequestContent);
     }
 
@@ -56,6 +57,7 @@ public class DefaultHttpChannelListener implements HttpChannel.Listener {
     @Override
     public void onResponseBegin(Request request) {
         diagnosticsManager.captureDiagnosticData(request, DiagnosticTag.ResponseBegin);
+        diagnosticsManager.logConditionally(request, DiagnosticTag.ResponseBegin);
     }
 
     @Override
@@ -65,6 +67,7 @@ public class DefaultHttpChannelListener implements HttpChannel.Listener {
 
     @Override
     public void onResponseContent(Request request, ByteBuffer content) {
+       //TODO In future, leverage container to capture individual response chunks time via Object
         diagnosticsManager.captureDiagnosticData(request, DiagnosticTag.ResponseContent);
     }
 

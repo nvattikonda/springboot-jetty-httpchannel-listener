@@ -20,13 +20,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 @ConditionalOnWebApplication
 @ConditionalOnProperty(value = "nv.jetty.httpchannel.diagnostics", havingValue = "true", matchIfMissing = false)
 public class DiagnosticsManager {
-    @Value("${nv.jetty.request.parsingTimeInMillis:5000}")
-    private long requestParsingTimeInMillis;
-    @Value("${nv.jetty.response.DispatchTimeInMillis:5000}")
-    private long responseDispatchTimeInMillis;
+    @Value("${nv.jetty.request.parsingTimeThresholdInMillis:5000}")
+    private long requestParsingThresholdTimeInMillis;
+    @Value("${nv.jetty.response.dispatchTimeThresholdInMillis:5000}")
+    private long responseDispatchThresholdTimeInMillis;
+    @Value("${nv.jetty.response.responseBeginThresholdInMillis:5000}")
+    private long responseBeginThresholdInMillis;
 
     private QueuedThreadPool queuedThreadPool;
     private final String DIAGNOSTIC_CONTAINER = "diagnosticContainer";
+    private final String REQUEST_URI = "requestURI";
     private AtomicInteger requestCounter = new AtomicInteger();
     private Logger logger = LoggerFactory.getLogger(DiagnosticsManager.class);
 
@@ -40,11 +43,15 @@ public class DiagnosticsManager {
             try {
                 switch (diagnosticTag) {
                     case RequestEnd:
-                        if (Long.valueOf(diagnosticContainer.get(diagnosticTag.name())) - Long.valueOf(diagnosticContainer.get(DiagnosticTag.RequestBegin.name())) > requestParsingTimeInMillis)
+                        if (Long.valueOf(diagnosticContainer.get(diagnosticTag.name())) - Long.valueOf(diagnosticContainer.get(DiagnosticTag.RequestBegin.name())) > requestParsingThresholdTimeInMillis)
                             log(request, new DiagnosticTag[]{DiagnosticTag.RequestBegin, DiagnosticTag.BeforeDispatch, DiagnosticTag.RequestContent, DiagnosticTag.RequestContentEnd, DiagnosticTag.RequestEnd});
                         break;
+                    case ResponseBegin:
+                        if (Long.valueOf(diagnosticContainer.get(diagnosticTag.name())) - Long.valueOf(diagnosticContainer.get(DiagnosticTag.RequestEnd.name())) > responseBeginThresholdInMillis)
+                            log(request, new DiagnosticTag[]{DiagnosticTag.RequestEnd, DiagnosticTag.ResponseBegin});
+                        break;
                     case ResponseEnd:
-                        if (Long.valueOf(diagnosticContainer.get(diagnosticTag.name())) - Long.valueOf(diagnosticContainer.get(DiagnosticTag.ResponseBegin.name())) > responseDispatchTimeInMillis)
+                        if (Long.valueOf(diagnosticContainer.get(diagnosticTag.name())) - Long.valueOf(diagnosticContainer.get(DiagnosticTag.ResponseBegin.name())) > responseDispatchThresholdTimeInMillis)
                             log(request, new DiagnosticTag[]{DiagnosticTag.ResponseBegin, DiagnosticTag.ResponseCommit, DiagnosticTag.ResponseContent, DiagnosticTag.ResponseEnd});
                         break;
                     default:
@@ -61,6 +68,7 @@ public class DiagnosticsManager {
         try {
             if (request != null) {
                 StringBuilder logBuilder = new StringBuilder();
+                logBuilder.append(REQUEST_URI).append(":").append(request.getRequestURI()).append("~");
                 logBuilder.append(getHeadersAsString(request));
                 if (diagnosticTags != null) {
                     logBuilder.append("|");
@@ -72,7 +80,7 @@ public class DiagnosticsManager {
                             logBuilder.append("~");
                     }
                 }
-                logger.info(logBuilder.toString());
+                logger.warn(logBuilder.toString());
             }
         } catch (Exception e) {
             logger.error("Encountered Error Processing DiagnosticTags:" + diagnosticTags != null ? Arrays.toString(diagnosticTags) : "NULL", e);
@@ -98,7 +106,7 @@ public class DiagnosticsManager {
     private void logRequestQueuing(Request request, int currentRequestCount) {
         try {
             if (queuedThreadPool != null && currentRequestCount > queuedThreadPool.getMaxThreads()) {
-                logger.warn("Requests getting queued, currentRequestProcessingCount:{},configuredMaxThreads:{},threadPoolQueueSize:{}, requestHeaders:{}", currentRequestCount, queuedThreadPool.getMaxThreads(), queuedThreadPool.getQueueSize(), getHeadersAsString(request));
+                logger.warn("Request getting queued, requestURI:{},currentRequestProcessingCount:{},configuredMaxThreads:{},threadPoolQueueSize:{}, requestHeaders:{}", request.getRequestURI(), currentRequestCount, queuedThreadPool.getMaxThreads(), queuedThreadPool.getQueueSize(), getHeadersAsString(request));
             }
         } catch (Exception e) {
             logger.error("Encountered Error Comparing server requestCounter with maxThreads", e);
@@ -120,8 +128,8 @@ public class DiagnosticsManager {
     }
 
     public int incrementRequestCounter(Request request) {
-        int currentRequestCount=requestCounter.incrementAndGet();
-        logRequestQueuing(request,currentRequestCount);
+        int currentRequestCount = requestCounter.incrementAndGet();
+        logRequestQueuing(request, currentRequestCount);
         return currentRequestCount;
     }
 
